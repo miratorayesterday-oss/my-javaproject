@@ -14,13 +14,20 @@ jobs:
         with:
           java-version: '17'
           distribution: 'temurin'
-      - name: Build with Gradle
+
+      - name: Build JAR
         run: |
-          chmod +x gradlew
-          ./gradlew build
+          # 1. すべてのJavaファイルをコンパイル
+          javac *.java
+          
+          # 2. マニフェストファイル（設定ファイル）を作成
+          echo "Manifest-Version: 1.0" > manifest.txt
+          
+          # 3. JARファイルを作成（現在のフォルダにあるクラスファイルを全部入れる）
+          jar cvfm GradualMagic1.12.2.jar manifest.txt *.class
 
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with:
           name: Mod-Jar
-          path: build/libs/*.jar
+          path: GradualMagic1.12.2.jar
