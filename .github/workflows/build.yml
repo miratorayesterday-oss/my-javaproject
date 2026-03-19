@@ -1,29 +1,22 @@
 yaml
-name: ci
-
+name: Make JAR
 on: [push]
-
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Set up JDK 17
+      - uses: actions/checkout@v4
+      - name: Setup Java
         uses: actions/setup-java@v4
         with:
           java-version: '17'
           distribution: 'temurin'
-
-      - name: Build JAR
+      - name: Create JAR
         run: |
-          javac Hello.java
-          jar cvfe MyFile.jar Hello Hello.class
-
-      - name: Upload Artifact
+          javac *.java
+          jar cvf my-output.jar *.class
+      - name: Upload JAR
         uses: actions/upload-artifact@v4
         with:
-          name: my-jar-file
-          path: MyFile.jar
-          if-no-files-found: error
+          name: converted-jar
+          path: my-output.jar
