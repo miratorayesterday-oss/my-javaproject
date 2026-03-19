@@ -1,0 +1,73 @@
+java
+/**
+* Project: Gradual Magic (Ver 1.12.2)
+* Features: 6 Elements, 4 Ranks, Charge Magic, MP System, Perception, Advancements-based Spawning
+*/
+// --- [1] メイン設定 & キーバインド ---
+public class GradualMagic {
+public static final String MODID = "gradualmagic";
+// KeyBindings: G(発動), R(切替), V(感知), M(編成GUI)
+}
+// --- [2] プレイヤー能力 & MPシステム (Data Holder) ---
+public class MagicState {
+public int mp = 1000;
+public final int maxMP = 1000;
+public int selectedSlot = 0; // 0-5
+public int[] equippedMagic = new int[6];
+public boolean isPerceptionActive = false;
+public int chargeTicks = 0;
+// 1秒間に2MP回復 (10チックごとに1回復)
+public void onTick(EntityPlayer player) {
+if (player.ticksExisted % 10 == 0 && mp < maxMP) {
+mp++;
+}
+}
+}
+// --- [3] 進捗連動型スポーン制御 (World Logic) ---
+@SubscribeEvent
+public void onCheckSpawn(LivingSpawnEvent.CheckSpawn event) {
+EntityPlayer player = event.getWorld().getClosestPlayerToEntity(event.getEntity(), 64.0D);
+int maxRank = 1; // 初期は下級のみ
+if (player != null) {
+// 進捗所持チェック (中級/上級/達人)
+if (hasAdvancement(player, "master")) maxRank = 4;
+else if (hasAdvancement(player, "advanced")) maxRank = 3;
+else if (hasAdvancement(player, "intermediate")) maxRank = 2;
+}
+// 確率設定 (下級75%, 中級20%, 上級4.5%, 達人0.5%)
+int rank = calculateWeightedRank(maxRank);
+event.getEntity().getEntityData().setInteger("MagicRank", rank);
+event.getEntity().getEntityData().setInteger("MagicAttribute", event.getWorld().rand.nextInt(6));
+}
+// --- [4] 魔力感知 & オーラ表示 (Client Rendering) ---
+@SubscribeEvent
+public void onRenderAura(RenderLivingEvent.Post event) {
+if (!MagicState.isPerceptionActive) return;
+EntityLivingBase entity = event.getEntity();
+int rank = entity.getEntityData().getInteger("MagicRank");
+int attr = entity.getEntityData().getInteger("MagicAttribute");
+// ランクに応じたオーラサイズ (1=0.5m, 4=5.0m)
+double size = (rank == 4) ? 5.0 : rank * 0.8;
+// 属性色 (0:炎-赤, 1:水-青, 2:風-緑, 3:土-茶, 4:光-金, 5:闇-紫)
+spawnAuraParticles(entity, size, getAttributeColor(attr));
+}
+// --- [5] 魔法編成GUI (Mキー) ---
+public class GuiMagicSetup extends GuiScreen {
+@Override
+public void drawScreen(int mouseX, int mouseY, float partialTicks) {
+this.drawDefaultBackground();
+// 24種の魔法ライブラリ(進捗ロック付)と6つの装備スロットを描画
+drawLibraryIcons();
+drawActiveSlots();
+super.drawScreen(mouseX, mouseY, partialTicks);
+}
+}
+// --- [6] 環境干渉 (上級以上のみ) ---
+public void onImpact(World w, BlockPos p, Element e, Rank r) {
+if (w.isRemote || r.ordinal() < Rank.HIGH.ordinal()) return;
+if (e == Element.WATER) {
+applyBonemealEffect(w, p); // 植物を成長させる
+} else if (e == Element.FIRE) {
+meltIceAndSnow(w, p); // 氷を溶かす
+}
+}
