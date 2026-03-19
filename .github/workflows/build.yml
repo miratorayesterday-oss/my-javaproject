@@ -20,12 +20,11 @@ jobs:
           javac Hello.java
           
           # 2. JARファイルを作成する
-          # jar cfe [完成品の名前] [メインクラス名] [含めるファイル]
+          # 順番: jar cfe [完成品の名前] [メインクラス名] [含めるファイル]
           jar cfe GradualMagic1.12.2.jar Hello Hello.class
 
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with:
           name: my-jar-file
-          # ここは上の手順2で作ったファイル名と合わせる必要があります
           path: GradualMagic1.12.2.jar
