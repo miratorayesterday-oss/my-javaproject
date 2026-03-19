@@ -18,3 +18,8 @@ jobs:
         run: |
           javac Hello.java
           jar cvf GradualMagic1.12.2.jar Hello.class          
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: GradualMagic-Jar
+          path: build/libs/*.jar
