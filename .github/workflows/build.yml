@@ -17,7 +17,7 @@ jobs:
       - name: Build JAR
         run: |
           javac *.java
-          jar cvfe GradualMagic1.12.2.jar GradualMagic1.12.2 *.class
+          jar cvfe GradualMagic1.12.2.jar GradualMagic1.12.2.class
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with:
