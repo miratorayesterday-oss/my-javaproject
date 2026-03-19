@@ -16,8 +16,8 @@ jobs:
           distribution: 'temurin'
       - name: Build JAR
         run: |
-          javac Hello.java
-          jar cvfe MyFile.jar Hello Hello.class
+          javac "GradualMagic1.12.2.jar"
+          jar cvfe GradualMagic1.12.2.jar GradualMagic1.12.2 "GradualMagic1.12.2.class
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with:
