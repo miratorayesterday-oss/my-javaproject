@@ -14,17 +14,13 @@ jobs:
         with:
           java-version: '17'
           distribution: 'temurin'
-      - name: Build JAR
+      - name: Build with Gradle
         run: |
-          # 1. Hello.javaをコンパイルしてHello.classを作る
-          javac Hello.java
-          
-          # 2. JARファイルを作成する
-          # 順番: jar cfe [完成品の名前] [メインクラス名] [含めるファイル]
-          jar cfe GradualMagic1.12.2.jar Hello Hello.class
+          chmod +x gradlew
+          ./gradlew build
 
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: my-jar-file
-          path: GradualMagic1.12.2.jar
+          name: Mod-Jar
+          path: build/libs/*.jar
