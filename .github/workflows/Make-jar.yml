@@ -1,0 +1,21 @@
+name: Make Real JAR
+on: [push]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          java-version: '8' # マイクラ1.12.2用ならJava 8が安定です
+          distribution: 'temurin'
+      - name: Create JAR
+        run: |
+          javac Hello.java
+          jar cvfe GradualMagic_real.jar Hello Hello.class
+      - name: Export JAR
+        uses: actions/upload-artifact@v4
+        with:
+          name: my-final-jar
+          path: GradualMagic_real.jar
